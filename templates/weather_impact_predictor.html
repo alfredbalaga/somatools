@@ -147,7 +147,7 @@ function displayResults(predictions) {
 }
 
 async function fetchWeatherData(latitude, longitude) {
-    const apiKey = '2fde3f2255c43f2d98f50d01fa405ac6'; // Replace with your actual API key
+    const apiKey = 'xxx'; // Replace with your actual API key
     const url = `https://api.openweathermap.org/data/2.5/forecast?lat=${latitude}&lon=${longitude}&appid=${apiKey}&units=metric`;
 
     const response = await fetch(url);
