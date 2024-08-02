@@ -1,0 +1,219 @@
+{% extends "base.html" %}
+
+{% block title %}Solar Financial Performance Calculator{% endblock %}
+
+{% block heading %}Solar Financial Performance Calculator{% endblock %}
+
+{% block content %}
+<div class="container mx-auto px-4 py-8">
+    <form id="calculatorForm" class="mb-8 bg-white shadow-md rounded px-8 pt-6 pb-8">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+            <div>
+                <label for="projectName" class="block text-gray-700 text-sm font-bold mb-2">
+                    Project Name:
+                    <span class="ml-1 text-gray-500 hover:text-gray-700" title="Enter a unique name for your project">ⓘ</span>
+                </label>
+                <input type="text" id="projectName" name="projectName" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" required>
+            </div>
+            <div>
+                <label for="systemCost" class="block text-gray-700 text-sm font-bold mb-2">
+                    Total System Cost:
+                    <span class="ml-1 text-gray-500 hover:text-gray-700" title="The total cost of installing the solar system">ⓘ</span>
+                </label>
+                <div class="flex">
+                    <input type="number" id="systemCost" name="systemCost" class="shadow appearance-none border rounded-l w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" required step="0.01">
+                    <select id="systemCostScale" name="systemCostScale" class="shadow border rounded-r bg-gray-100 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+                        <option value="1">PHP</option>
+                        <option value="1000000">Million PHP</option>
+                        <option value="1000000000">Billion PHP</option>
+                    </select>
+                </div>
+            </div>
+            <div>
+                <label for="annualProduction" class="block text-gray-700 text-sm font-bold mb-2">
+                    Annual Energy Production:
+                    <span class="ml-1 text-gray-500 hover:text-gray-700" title="The expected annual energy production of the solar system">ⓘ</span>
+                </label>
+                <div class="flex">
+                    <input type="number" id="annualProduction" name="annualProduction" class="shadow appearance-none border rounded-l w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" required step="0.01">
+                    <select id="annualProductionScale" name="annualProductionScale" class="shadow border rounded-r bg-gray-100 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+                        <option value="1">kWh</option>
+                        <option value="1000">MWh</option>
+                        <option value="1000000">GWh</option>
+                    </select>
+                </div>
+            </div>
+            <div>
+                <label for="electricityRate" class="block text-gray-700 text-sm font-bold mb-2">
+                    Electricity Rate (PHP/kWh):
+                    <span class="ml-1 text-gray-500 hover:text-gray-700" title="The current or expected electricity rate">ⓘ</span>
+                </label>
+                <input type="number" id="electricityRate" name="electricityRate" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" required step="0.01">
+            </div>
+            <div>
+                <label for="annualExpenses" class="block text-gray-700 text-sm font-bold mb-2">
+                    Annual Operating Expenses:
+                    <span class="ml-1 text-gray-500 hover:text-gray-700" title="Yearly costs for maintenance, insurance, etc.">ⓘ</span>
+                </label>
+                <div class="flex">
+                    <input type="number" id="annualExpenses" name="annualExpenses" class="shadow appearance-none border rounded-l w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" required step="0.01">
+                    <select id="annualExpensesScale" name="annualExpensesScale" class="shadow border rounded-r bg-gray-100 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+                        <option value="1">PHP</option>
+                        <option value="1000000">Million PHP</option>
+                        <option value="1000000000">Billion PHP</option>
+                    </select>
+                </div>
+            </div>
+            <div>
+                <label for="annualDegradation" class="block text-gray-700 text-sm font-bold mb-2">
+                    Annual Degradation Rate (%):
+                    <span class="ml-1 text-gray-500 hover:text-gray-700" title="The yearly decrease in solar panel efficiency">ⓘ</span>
+                </label>
+                <input type="number" id="annualDegradation" name="annualDegradation" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" required step="0.1" value="0.5">
+            </div>
+            <div>
+                <label for="inflationRate" class="block text-gray-700 text-sm font-bold mb-2">
+                    Inflation Rate (%):
+                    <span class="ml-1 text-gray-500 hover:text-gray-700" title="Expected annual inflation rate">ⓘ</span>
+                </label>
+                <input type="number" id="inflationRate" name="inflationRate" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" required step="0.1" value="4.0">
+            </div>
+            <div>
+                <label for="discountRate" class="block text-gray-700 text-sm font-bold mb-2">
+                    Discount Rate (%):
+                    <span class="ml-1 text-gray-500 hover:text-gray-700" title="The rate used to discount future cash flows to present value">ⓘ</span>
+                </label>
+                <input type="number" id="discountRate" name="discountRate" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" required step="0.1" value="6.0">
+            </div>
+            <div>
+                <label for="projectLifetime" class="block text-gray-700 text-sm font-bold mb-2">
+                    Project Lifetime (years):
+                    <span class="ml-1 text-gray-500 hover:text-gray-700" title="The expected operational lifespan of the solar project">ⓘ</span>
+                </label>
+                <input type="number" id="projectLifetime" name="projectLifetime" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" required step="1" value="25">
+            </div>
+        </div>
+        <div class="flex items-center justify-between">
+            <button type="submit" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">
+                Calculate Financial Performance
+            </button>
+        </div>
+    </form>
+
+    <div id="sensitivityAnalysis" class="mb-8 bg-white shadow-md rounded px-8 pt-6 pb-8 mt-8">
+        <h2 class="text-2xl font-bold mb-4 text-gray-800">Sensitivity Analysis</h2>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+            <div>
+                <label for="sensitivityVariable" class="block text-gray-700 text-sm font-bold mb-2">
+                    Variable to Analyze:
+                </label>
+                <select id="sensitivityVariable" class="shadow border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+                    <option value="systemCost">System Cost</option>
+                    <option value="annualProduction">Annual Production</option>
+                    <option value="electricityRate">Electricity Rate</option>
+                    <option value="annualExpenses">Annual Expenses</option>
+                    <option value="annualDegradation">Annual Degradation</option>
+                </select>
+            </div>
+            <div>
+                <label for="sensitivityRange" class="block text-gray-700 text-sm font-bold mb-2">
+                    Range (%):
+                </label>
+                <input type="number" id="sensitivityRange" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" value="20" min="1" max="100">
+            </div>
+            <div>
+                <label for="sensitivitySteps" class="block text-gray-700 text-sm font-bold mb-2">
+                    Number of Steps:
+                </label>
+                <input type="number" id="sensitivitySteps" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" value="5" min="3" max="20">
+            </div>
+        </div>
+        <button id="runSensitivityAnalysis" class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">
+            Run Sensitivity Analysis
+        </button>
+    </div>
+
+    <div id="sensitivityResults" class="mb-8 hidden">
+        <h2 class="text-2xl font-bold mb-4 text-gray-800">Sensitivity Analysis Results</h2>
+        <div class="bg-white shadow-md rounded p-4">
+            <canvas id="sensitivityChart"></canvas>
+        </div>
+    </div>
+
+    <div id="monteCarloSimulation" class="mb-8 bg-white shadow-md rounded px-8 pt-6 pb-8 mt-8 hidden">
+        <h2 class="text-2xl font-bold mb-4 text-gray-800">Monte Carlo Simulation</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+            <div>
+                <label for="simulationRuns" class="block text-gray-700 text-sm font-bold mb-2">
+                    Number of Simulation Runs:
+                </label>
+                <input type="number" id="simulationRuns" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" value="1000" min="100" max="10000">
+            </div>
+            <div>
+                <label for="confidenceInterval" class="block text-gray-700 text-sm font-bold mb-2">
+                    Confidence Interval (%):
+                </label>
+                <input type="number" id="confidenceInterval" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" value="95" min="1" max="99">
+            </div>
+        </div>
+        <button id="runMonteCarloSimulation" class="bg-purple-500 hover:bg-purple-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">
+            Run Monte Carlo Simulation
+        </button>
+    </div>
+    
+    <div id="monteCarloResults" class="mb-8 hidden">
+        <h2 class="text-2xl font-bold mb-4 text-gray-800">Monte Carlo Simulation Results</h2>
+        <div class="bg-white shadow-md rounded p-4">
+            <canvas id="monteCarloChart"></canvas>
+        </div>
+        <div id="monteCarloStats" class="mt-4 grid grid-cols-1 md:grid-cols-2 gap-4">
+            <!-- Statistics will be inserted here by JavaScript -->
+        </div>
+    </div>
+
+    <div id="results" class="mb-8 hidden">
+        <h2 class="text-2xl font-bold mb-4 text-gray-800">Results</h2>
+        <div class="bg-white shadow-md rounded p-4">
+            <p id="roiResult" class="mb-2"></p>
+            <p id="irrResult" class="mb-2"></p>
+            <p id="paybackResult" class="mb-2"></p>
+            <p id="npvResult" class="mb-2"></p>
+            <p id="lcoeResult" class="mb-2"></p>
+        </div>
+    </div>
+
+    <div id="charts" class="mb-8 hidden">
+        <h2 class="text-2xl font-bold mb-4 text-gray-800">Performance Charts</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div class="bg-white shadow-md rounded p-4">
+                <canvas id="cashFlowChart"></canvas>
+            </div>
+            <div class="bg-white shadow-md rounded p-4">
+                <canvas id="productionChart"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <div class="disclaimer mt-8 p-4 bg-yellow-50 border border-yellow-200 rounded-md">
+        <h4 class="font-semibold mb-2 text-yellow-800">Disclaimer:</h4>
+        <p class="text-sm text-yellow-700">
+            The calculations provided by this tool are based on the inputs provided and use simplified models. 
+            Actual financial performance may vary due to numerous factors not accounted for in this basic analysis. 
+            This tool is for informational purposes only and should not be considered as financial advice. 
+            Please consult with qualified professionals for comprehensive financial analysis and investment decisions.
+        </p>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="{{ url_for('static', filename='js/financial_calculator.js') }}" defer></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/chartjs-plugin-annotation/2.1.0/chartjs-plugin-annotation.min.js"></script>
+<script>
+    Chart.register(ChartAnnotation);
+</script>
+<noscript>
+    <p class="text-red-500 font-bold">This calculator requires JavaScript to function. Please enable JavaScript in your browser.</p>
+</noscript>
+{% endblock %}

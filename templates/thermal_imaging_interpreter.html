@@ -1,0 +1,90 @@
+{% extends "base.html" %}
+{% block title %}Enhanced Thermal Imaging Interpreter{% endblock %}
+{% block heading %}Enhanced Thermal Imaging Interpreter{% endblock %}
+{% block content %}
+
+<div class="bg-white shadow-md rounded-lg p-6">
+    <div class="mb-6">
+        <h2 class="text-xl font-semibold mb-2">Upload Images</h2>
+        <div class="flex items-center space-x-4">
+            <input type="file" id="imageUpload" accept="image/*" multiple class="hidden">
+            <label for="imageUpload" class="cursor-pointer bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+                Select Images
+            </label>
+            <span id="fileCount" class="text-gray-600"></span>
+        </div>
+        <div id="fileList" class="mt-2 text-sm text-gray-600"></div>
+    </div>
+
+    <div class="mb-6">
+        <h2 class="text-xl font-semibold mb-2">Analysis Settings</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+                <label for="minTemp" class="block text-sm font-medium text-gray-700">Minimum Temperature (°C)</label>
+                <input type="number" id="minTemp" name="minTemp" value="20" min="0" max="200" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
+            </div>
+            <div>
+                <label for="maxTemp" class="block text-sm font-medium text-gray-700">Maximum Temperature (°C)</label>
+                <input type="number" id="maxTemp" name="maxTemp" value="100" min="0" max="200" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
+            </div>
+        </div>
+    </div>
+
+    <div class="mb-6">
+        <button id="analyzeBtn" class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded">
+            Analyze Images
+        </button>
+        <div id="progressBar" class="hidden mt-2 w-full bg-gray-200 rounded-full h-2.5 dark:bg-gray-700">
+            <div class="bg-blue-600 h-2.5 rounded-full" style="width: 0%"></div>
+        </div>
+    </div>
+
+    <div id="results" class="hidden">
+        <h2 class="text-2xl font-semibold mb-4">Analysis Results</h2>
+        <div id="imageCarousel" class="mb-6">
+            <div class="flex justify-between items-center mb-2">
+                <button id="prevImage" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">&lt; Previous</button>
+                <span id="imageCounter" class="text-lg font-semibold"></span>
+                <button id="nextImage" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">Next &gt;</button>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                    <h3 class="text-lg font-semibold mb-2">Original Image</h3>
+                    <img id="originalImage" class="max-w-full h-auto rounded-lg shadow-md" alt="Original thermal image">
+                </div>
+                <div>
+                    <h3 class="text-lg font-semibold mb-2">Processed Image</h3>
+                    <img id="processedImage" class="max-w-full h-auto rounded-lg shadow-md" alt="Processed thermal image">
+                </div>
+            </div>
+        </div>
+
+        <select id="sortSelect" class="border rounded p-2">
+            <option value="temp-desc">Temperature (High to Low)</option>
+            <option value="temp-asc">Temperature (Low to High)</option>
+            <option value="severity">Severity</option>
+            <option value="area-desc">Area (Largest to Smallest)</option>
+        </select>
+
+        <div id="analysisResult" class="mt-6"></div>
+
+
+        <div id="temperatureDistribution" class="mt-6">
+            <h3 class="text-lg font-semibold mb-2">Temperature Distribution</h3>
+            <canvas id="tempDistChart"></canvas>
+        </div>
+
+        <div id="recommendations" class="mt-6 p-4 bg-blue-50 border border-blue-200 rounded-md"></div>
+    </div>
+
+    <div id="batchSummary" class="mt-6 hidden">
+        <h2 class="text-2xl font-semibold mb-4">Batch Analysis Summary</h2>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.7.0/chart.min.js"></script>
+<script src="{{ url_for('static', filename='js/thermal_imaging_interpreter.js') }}"></script>
+{% endblock %}

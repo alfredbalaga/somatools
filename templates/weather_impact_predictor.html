@@ -1,0 +1,208 @@
+{% extends "base.html" %}
+
+{% block title %}Weather Impact Predictor{% endblock %}
+
+{% block heading %}Weather Impact Predictor{% endblock %}
+
+{% block content %}
+<div class="bg-white shadow-md rounded-lg p-6">
+    <form id="weatherImpactForm" class="space-y-4">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+                <label for="latitude" class="block text-sm font-medium text-gray-700">Latitude:</label>
+                <input type="number" id="latitude" name="latitude" required step="0.000001" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
+            </div>
+            <div>
+                <label for="longitude" class="block text-sm font-medium text-gray-700">Longitude:</label>
+                <input type="number" id="longitude" name="longitude" required step="0.000001" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
+            </div>
+        </div>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+                <label for="systemCapacity" class="block text-sm font-medium text-gray-700">System Capacity (kWp):</label>
+                <input type="number" id="systemCapacity" name="systemCapacity" required step="0.01" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
+            </div>
+            <div>
+                <label for="performanceRatio" class="block text-sm font-medium text-gray-700">Performance Ratio (%):</label>
+                <input type="number" id="performanceRatio" name="performanceRatio" required min="0" max="100" step="0.1" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
+            </div>
+        </div>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+                <label for="panelType" class="block text-sm font-medium text-gray-700">Panel Type:</label>
+                <select id="panelType" name="panelType" class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm rounded-md">
+                    <option value="monocrystalline">Monocrystalline</option>
+                    <option value="polycrystalline">Polycrystalline</option>
+                    <option value="thinFilm">Thin Film</option>
+                </select>
+            </div>
+            <div>
+                <label for="panelAge" class="block text-sm font-medium text-gray-700">Panel Age (years):</label>
+                <input type="number" id="panelAge" name="panelAge" required min="0" max="50" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
+            </div>
+        </div>
+        <button type="submit" class="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+            Predict Weather Impact
+        </button>
+    </form>
+    <div id="result" class="mt-6"></div>
+    <canvas id="productionChart" class="mt-6"></canvas>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+let productionChart;
+
+function calculateProduction(weatherData, systemParams) {
+    const { systemCapacity, performanceRatio, panelType, panelAge } = systemParams;
+
+    return weatherData.map(day => {
+        const temperatureEffect = 1 - 0.004 * Math.max(0, day.temperature - 25);
+        const cloudEffect = 1 - (day.cloudCover / 100) * 0.75;
+        const agingEffect = calculateAgingEffect(panelType, panelAge);
+        const dailyProduction = systemCapacity * performanceRatio * agingEffect * 24 * temperatureEffect * cloudEffect;
+
+        return {
+            date: day.date,
+            temperature: day.temperature,
+            cloudCover: day.cloudCover,
+            predictedProduction: Math.max(0, dailyProduction)
+        };
+    });
+}
+
+function calculateAgingEffect(panelType, panelAge) {
+    const annualDegradationRate = getAnnualDegradationRate(panelType);
+    return Math.pow(1 - annualDegradationRate, panelAge);
+}
+
+function getAnnualDegradationRate(panelType) {
+    switch(panelType) {
+        case 'monocrystalline': return 0.005;
+        case 'polycrystalline': return 0.006;
+        case 'thinFilm': return 0.007;
+        default: return 0.006;
+    }
+}
+
+function validateInputs() {
+    const latitude = parseFloat(document.getElementById('latitude').value);
+    const longitude = parseFloat(document.getElementById('longitude').value);
+    const systemCapacity = parseFloat(document.getElementById('systemCapacity').value);
+    const performanceRatio = parseFloat(document.getElementById('performanceRatio').value);
+    const panelType = document.getElementById('panelType').value;
+    const panelAge = parseInt(document.getElementById('panelAge').value);
+
+    if (isNaN(latitude) || isNaN(longitude) || isNaN(systemCapacity) || isNaN(performanceRatio) || isNaN(panelAge)) {
+        throw new Error('Please fill in all fields with valid numbers.');
+    }
+
+    if (performanceRatio <= 0 || performanceRatio > 100) {
+        throw new Error('Performance Ratio must be between 0 and 100.');
+    }
+
+    if (panelAge < 0 || panelAge > 50) {
+        throw new Error('Panel Age must be between 0 and 50 years.');
+    }
+
+    return { latitude, longitude, systemCapacity, performanceRatio: performanceRatio / 100, panelType, panelAge };
+}
+
+async function predictWeatherImpact(e) {
+    e.preventDefault();
+
+    try {
+        const inputs = validateInputs();
+        const weatherData = await fetchWeatherData(inputs.latitude, inputs.longitude);
+        const predictions = calculateProduction(weatherData, inputs);
+        displayResults(predictions);
+        updateChart(predictions);
+    } catch (error) {
+        console.error('Error in predictWeatherImpact:', error);
+        document.getElementById('result').innerHTML = `<p class="text-red-600">Error: ${error.message}</p>`;
+    }
+}
+
+function displayResults(predictions) {
+    const resultDiv = document.getElementById('result');
+    if (!Array.isArray(predictions) || predictions.length === 0) {
+        resultDiv.innerHTML = '<p class="text-red-600">Error: No prediction data available</p>';
+        return;
+    }
+
+    let html = '<h3 class="text-xl font-semibold mb-2">Predicted Daily Production:</h3>';
+    html += '<ul class="space-y-2">';
+    predictions.forEach(day => {
+        html += `<li>
+            <strong>${day.date}:</strong> 
+            ${day.predictedProduction.toFixed(2)} kWh 
+            (Temp: ${day.temperature.toFixed(1)}°C, 
+            Cloud Cover: ${day.cloudCover.toFixed(1)}%)
+        </li>`;
+    });
+    html += '</ul>';
+    resultDiv.innerHTML = html;
+}
+
+async function fetchWeatherData(latitude, longitude) {
+    const apiKey = '2fde3f2255c43f2d98f50d01fa405ac6'; // Replace with your actual API key
+    const url = `https://api.openweathermap.org/data/2.5/forecast?lat=${latitude}&lon=${longitude}&appid=${apiKey}&units=metric`;
+
+    const response = await fetch(url);
+    if (!response.ok) {
+        throw new Error('Failed to fetch weather data. Please try again.');
+    }
+    const data = await response.json();
+
+    return data.list.filter((item, index) => index % 8 === 0).map(item => ({
+        date: new Date(item.dt * 1000).toISOString().split('T')[0],
+        temperature: item.main.temp,
+        cloudCover: item.clouds.all
+    }));
+}
+
+function updateChart(predictions) {
+    const canvas = document.getElementById('productionChart');
+    if (!canvas) {
+        console.error('Chart canvas element not found');
+        return;
+    }
+    
+    const ctx = canvas.getContext('2d');
+    
+    if (productionChart) {
+        productionChart.destroy();
+    }
+    
+    productionChart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: predictions.map(day => day.date),
+            datasets: [{
+                label: 'Predicted Production (kWh)',
+                data: predictions.map(day => day.predictedProduction),
+                backgroundColor: 'rgba(54, 162, 235, 0.6)'
+            }]
+        },
+        options: {
+            responsive: true,
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    title: {
+                        display: true,
+                        text: 'Production (kWh)'
+                    }
+                }
+            }
+        }
+    });
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+    document.getElementById('weatherImpactForm').addEventListener('submit', predictWeatherImpact);
+});
+</script>
+{% endblock %}

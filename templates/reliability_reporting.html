@@ -1,0 +1,128 @@
+{% extends "base.html" %}
+{% block title %}Solar Reliability Reporting{% endblock %}
+{% block heading %}Solar Reliability Reporting Tool{% endblock %}
+{% block content %}
+<div class="bg-white shadow-md rounded-lg p-6">
+    <form id="reliabilityForm" class="space-y-4">
+        <h2 class="text-xl font-semibold mb-4">Plant Specifications</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+                <label for="capacity" class="block text-sm font-medium text-gray-700">Plant Capacity (MW):</label>
+                <div class="mt-1 relative rounded-md shadow-sm">
+                    <input type="number" id="capacity" name="capacity" required min="0" step="0.1" class="block w-full pr-10 border-gray-300 focus:ring-blue-500 focus:border-blue-500 rounded-md">
+                    <div class="absolute inset-y-0 right-0 pr-3 flex items-center">
+                        <span class="text-gray-500 cursor-pointer" title="Enter the total capacity of the plant in megawatts (MW)">ⓘ</span>
+                    </div>
+                </div>
+            </div>
+            <div>
+                <label for="feeders" class="block text-sm font-medium text-gray-700">Number of Feeders:</label>
+                <div class="mt-1 relative rounded-md shadow-sm">
+                    <input type="number" id="feeders" name="feeders" required min="1" step="1" class="block w-full pr-10 border-gray-300 focus:ring-blue-500 focus:border-blue-500 rounded-md">
+                    <div class="absolute inset-y-0 right-0 pr-3 flex items-center">
+                        <span class="text-gray-500 cursor-pointer" title="Enter the total number of feeders in the plant">ⓘ</span>
+                    </div>
+                </div>
+            </div>
+            <div>
+                <label for="mvStations" class="block text-sm font-medium text-gray-700">Number of Medium Voltage Stations:</label>
+                <div class="mt-1 relative rounded-md shadow-sm">
+                    <input type="number" id="mvStations" name="mvStations" required min="1" step="1" class="block w-full pr-10 border-gray-300 focus:ring-blue-500 focus:border-blue-500 rounded-md">
+                    <div class="absolute inset-y-0 right-0 pr-3 flex items-center">
+                        <span class="text-gray-500 cursor-pointer" title="Enter the total number of medium voltage stations in the plant">ⓘ</span>
+                    </div>
+                </div>
+            </div>
+            <div>
+                <label for="inverters" class="block text-sm font-medium text-gray-700">Number of Inverters:</label>
+                <div class="mt-1 relative rounded-md shadow-sm">
+                    <input type="number" id="inverters" name="inverters" required min="1" step="1" class="block w-full pr-10 border-gray-300 focus:ring-blue-500 focus:border-blue-500 rounded-md">
+                    <div class="absolute inset-y-0 right-0 pr-3 flex items-center">
+                        <span class="text-gray-500 cursor-pointer" title="Enter the total number of inverters in the plant">ⓘ</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <h2 class="text-xl font-semibold mb-4 mt-6">Allowance and Historical Data</h2>
+        <div class="space-y-4">
+            <div>
+                <label for="yearlyAllowance" class="block text-sm font-medium text-gray-700">Yearly Outage Factor Allowance (%):</label>
+                <div class="mt-1 relative rounded-md shadow-sm">
+                    <input type="number" id="yearlyAllowance" name="yearlyAllowance" min="0" max="100" step="0.0001" class="block w-full pr-10 border-gray-300 focus:ring-blue-500 focus:border-blue-500 rounded-md">
+                    <div class="absolute inset-y-0 right-0 pr-3 flex items-center">
+                        <span class="text-gray-500 cursor-pointer" title="Enter the allowed yearly outage factor as a percentage">ⓘ</span>
+                    </div>
+                </div>
+            </div>
+            <div>
+                <label for="historicalOutageFactor" class="block text-sm font-medium text-gray-700">Historical Yearly Outage Factor (%):</label>
+                <div class="mt-1 relative rounded-md shadow-sm">
+                    <input type="number" id="historicalOutageFactor" name="historicalOutageFactor" min="0" max="100" step="0.0001" class="block w-full pr-10 border-gray-300 focus:ring-blue-500 focus:border-blue-500 rounded-md">
+                    <div class="absolute inset-y-0 right-0 pr-3 flex items-center">
+                        <span class="text-gray-500 cursor-pointer" title="Enter the actual incurred outage factor for the previous year as a percentage">ⓘ</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <h2 class="text-xl font-semibold mb-4 mt-6">Outage Data</h2>
+        <div class="space-y-4">
+            <div>
+                <label for="affectedUnit" class="block text-sm font-medium text-gray-700">Select Affected Unit:</label>
+                <select id="affectedUnit" name="affectedUnit" required class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500" title="Select the type of unit affected by the outage">
+                    <option value="plant">Entire Plant</option>
+                    <option value="feeder">Feeder</option>
+                    <option value="mvStation">MV Station</option>
+                    <option value="inverter">Inverter</option>
+                </select>
+            </div>
+            <div>
+                <label for="outageHours" class="block text-sm font-medium text-gray-700">Outage Hours:</label>
+                <input type="number" id="outageHours" name="outageHours" required min="0" step="0.1" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500" title="Enter the number of hours the unit was out of service. This should not exceed the total hours in the selected period.">
+            </div>
+            <div>
+                <label for="unitsAffected" class="block text-sm font-medium text-gray-700">Number of Units Affected:</label>
+                <input type="number" id="unitsAffected" name="unitsAffected" required min="1" step="1" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500" title="Enter the number of units affected by the outage. This cannot exceed the total number of units of the selected type.">
+            </div>
+            <div>
+                <label for="derationPercentage" class="block text-sm font-medium text-gray-700">Deration Percentage (%):</label>
+                <input type="number" id="derationPercentage" name="derationPercentage" min="0" max="100" step="0.1" value="0" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500" title="Enter the percentage of capacity reduction during the outage. 0% means full outage, while a value between 0% and 100% indicates partial capacity loss.">
+            </div>
+            <div>
+                <label for="periodType" class="block text-sm font-medium text-gray-700">Select Period:</label>
+                <select id="periodType" name="periodType" required class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500" title="Select the time period for which you are reporting the outage">
+                    <option value="daily">Daily</option>
+                    <option value="monthly">Monthly</option>
+                    <option value="yearly">Yearly</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="mt-6">
+            <button type="submit" class="w-full bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline transition duration-300">
+                Calculate Reliability Factors
+            </button>
+        </div>
+    </form>
+
+    <div id="results" class="mt-8 hidden">
+        <h2 class="text-2xl font-bold mb-4 text-gray-800">Results</h2>
+        <div class="bg-gray-100 p-4 rounded-md">
+            <div id="inputPeriodResults" class="mb-4"></div>
+            <div id="dailyResults" class="mb-4"></div>
+            <div id="monthlyResults" class="mb-4"></div>
+            <div id="yearlyResults" class="mb-4"></div>
+        </div>
+    </div>
+
+    <div id="chart" class="mt-8 hidden" style="height: 400px;">
+        <canvas id="reliabilityChart"></canvas>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="{{ url_for('static', filename='js/reliability_reporting.js') }}"></script>
+{% endblock %}

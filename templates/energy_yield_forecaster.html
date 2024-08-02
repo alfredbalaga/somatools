@@ -1,0 +1,101 @@
+{% extends "base.html" %}
+
+{% block title %}Energy Yield Forecaster{% endblock %}
+
+{% block heading %}Energy Yield Forecaster{% endblock %}
+
+{% block content %}
+<div class="bg-white shadow-md rounded-lg p-6">
+    <p class="mb-4">This tool forecasts energy yield based on input parameters and historical data.</p>
+    
+    <form id="forecastForm" class="space-y-4">
+        <div>
+            <label for="installedCapacity" class="block text-sm font-medium text-gray-700">Installed Capacity (kWp):</label>
+            <input type="number" id="installedCapacity" name="installedCapacity" required 
+                   class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                   title="Enter the total peak power output of the installed solar panels under standard test conditions">
+            <span class="text-xs text-gray-500">The total peak power output of the installed solar panels under standard test conditions.</span>
+        </div>
+
+        <div>
+            <label for="irradianceType" class="block text-sm font-medium text-gray-700">Irradiance Data Type:</label>
+            <select id="irradianceType" 
+                    class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm rounded-md"
+                    title="Select the type of irradiance data you have available">
+                <option value="insolation">Daily Insolation</option>
+                <option value="irradiance">Daily Irradiance and Service Hours</option>
+            </select>
+            <span class="text-xs text-gray-500">Choose the type of irradiance data available to you.</span>
+        </div>
+
+        <div id="insolationInput">
+            <label for="insolation" class="block text-sm font-medium text-gray-700">Expected Daily Insolation (kWh/m²/day):</label>
+            <input type="number" id="insolation" name="insolation" 
+                   class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                   title="Enter the total solar energy received per square meter per day">
+            <span class="text-xs text-gray-500">The total solar energy received per square meter per day.</span>
+        </div>
+
+        <div id="irradianceInputs" class="hidden space-y-4">
+            <div>
+                <label for="irradiance" class="block text-sm font-medium text-gray-700">Average Daily Irradiance (W/m²):</label>
+                <input type="number" id="irradiance" name="irradiance" 
+                       class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                       title="Enter the average solar power received per square meter during daylight hours">
+                <span class="text-xs text-gray-500">The average solar power received per square meter during daylight hours.</span>
+            </div>
+            <div>
+                <label for="serviceHours" class="block text-sm font-medium text-gray-700">Inverter Service Hours (hours):</label>
+                <input type="number" id="serviceHours" name="serviceHours" 
+                       class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                       title="Enter the number of hours the inverter is operational per day">
+                <span class="text-xs text-gray-500">The number of hours the inverter is operational per day.</span>
+            </div>
+        </div>
+        
+        <div>
+            <label for="efficiency" class="block text-sm font-medium text-gray-700">System Efficiency (%):</label>
+            <input type="number" id="efficiency" name="efficiency" min="0" max="100" required 
+                   class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                   title="Enter the overall efficiency of the solar power system, including panel and inverter efficiencies">
+            <span class="text-xs text-gray-500">The overall efficiency of the solar power system, including panel and inverter efficiencies.</span>
+        </div>
+        
+        <div>
+            <label for="losses" class="block text-sm font-medium text-gray-700">Expected Losses (%):</label>
+            <input type="number" id="losses" name="losses" min="0" max="100" required 
+                   class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                   title="Enter the expected system losses due to factors like shading, soiling, and wiring">
+            <span class="text-xs text-gray-500">Expected system losses due to factors like shading, soiling, and wiring.</span>
+        </div>
+        
+        <div>
+            <label for="seasonality" class="block text-sm font-medium text-gray-700">Seasonality Factor:</label>
+            <select id="seasonality" name="seasonality" 
+                    class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm rounded-md"
+                    title="Select the season to adjust for variations in solar irradiance">
+                <option value="1.1">Summer</option>
+                <option value="1.0">Spring/Fall</option>
+                <option value="0.9">Winter</option>
+            </select>
+            <span class="text-xs text-gray-500">Adjustment factor for seasonal variations in solar irradiance.</span>
+        </div>
+        
+        <div>
+            <button type="submit" class="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                Forecast Energy Yield
+            </button>
+        </div>
+    </form>
+    
+    <div id="result" class="mt-6"></div>
+    
+    <canvas id="chart" class="mt-6"></canvas>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="/static/js/energy_yield_forecaster.js"></script>
+<script src="https://unpkg.com/@popperjs/core@2"></script>
+<script src="https://unpkg.com/tippy.js@6"></script>
+{% endblock %}

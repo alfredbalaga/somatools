@@ -1,0 +1,121 @@
+{% extends "base.html" %}
+
+{% block title %}SOMA{% endblock %}
+
+{% block heading %}
+    <i class="fas fa-tools mr-2"></i>Solar O&M Assistant
+{% endblock %}
+
+{% block content %}
+<style>
+    /* Custom tooltip styles */
+    .tooltip {
+        position: relative;
+    }
+    .tooltip::after {
+        content: attr(data-tooltip);
+        position: absolute;
+        bottom: 100%;
+        left: 50%;
+        transform: translateX(-50%);
+        background-color: rgba(0, 0, 0, 0.8);
+        color: white;
+        padding: 5px 10px;
+        border-radius: 4px;
+        font-size: 14px;
+        white-space: nowrap;
+        opacity: 0;
+        visibility: hidden;
+        transition: opacity 0.3s, visibility 0.3s;
+    }
+    .tooltip:hover::after {
+        opacity: 1;
+        visibility: visible;
+    }
+</style>
+
+<div class="space-y-12">
+    <section id="performance-analysis">
+        <h2 class="text-2xl font-bold mb-4 text-primary-blue">
+            <i class="fas fa-chart-line mr-2"></i>Performance Analysis
+        </h2>
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            <a href="/pr_calculator" class="tooltip neumorphic p-4 h-40 flex items-center justify-center hover:bg-gray-100 transition duration-300" data-tooltip="Calculate and analyze solar plant performance ratio">
+                <h3 class="text-lg font-semibold text-primary-blue text-center">Performance Ratio Calculator</h3>
+            </a>
+            <a href="/energy_yield_forecaster" class="tooltip neumorphic p-4 h-40 flex items-center justify-center hover:bg-gray-100 transition duration-300" data-tooltip="Predict future energy production of your solar plant">
+                <h3 class="text-lg font-semibold text-primary-blue text-center">Energy Yield Forecaster</h3>
+            </a>
+            <a href="/iv_curve_analyzer" class="tooltip neumorphic p-4 h-40 flex items-center justify-center hover:bg-gray-100 transition duration-300" data-tooltip="Analyze current-voltage characteristics of solar panels">
+                <h3 class="text-lg font-semibold text-primary-blue text-center">I-V Curve Analyzer</h3>
+            </a>
+        </div>
+    </section>
+
+    <section id="financial-tools">
+        <h2 class="text-2xl font-bold mb-4 text-primary-blue">
+            <i class="fas fa-calculator mr-2"></i>Financial Tools
+        </h2>
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            <a href="/financial_performance_calculator" class="tooltip neumorphic p-4 h-40 flex items-center justify-center hover:bg-gray-100 transition duration-300" data-tooltip="Evaluate financial aspects of your solar projects">
+                <h3 class="text-lg font-semibold text-primary-blue text-center">Financial Performance Calculator</h3>
+            </a>
+            <a href="/generic_financial" class="tooltip neumorphic p-4 h-40 flex items-center justify-center hover:bg-gray-100 transition duration-300" data-tooltip="Perform various financial calculations for your projects">
+                <h3 class="text-lg font-semibold text-primary-blue text-center">Generic Financial Calculator</h3>
+            </a>
+        </div>
+    </section>
+
+    <section id="fault-detection">
+        <h2 class="text-2xl font-bold mb-4 text-primary-blue">
+            <i class="fas fa-exclamation-triangle mr-2"></i>Fault Detection
+        </h2>
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            <a href="/string_fault_detector" class="tooltip neumorphic p-4 h-40 flex items-center justify-center hover:bg-gray-100 transition duration-300" data-tooltip="Identify faults in your solar panel strings">
+                <h3 class="text-lg font-semibold text-primary-blue text-center">String Fault Detector</h3>
+            </a>
+            <a href="/thermal_imaging_interpreter" class="tooltip neumorphic p-4 h-40 flex items-center justify-center hover:bg-gray-100 transition duration-300" data-tooltip="Analyze thermal images of your solar panels">
+                <h3 class="text-lg font-semibold text-primary-blue text-center">Thermal Imaging Interpreter</h3>
+            </a>
+            <a href="/fault_diagnosis" class="tooltip neumorphic p-4 h-40 flex items-center justify-center hover:bg-gray-100 transition duration-300" data-tooltip="Systematic approach to diagnose solar plant issues">
+                <h3 class="text-lg font-semibold text-primary-blue text-center">Fault Diagnosis Decision Tree</h3>
+            </a>
+        </div>
+    </section>
+
+    <section id="forecasting">
+        <h2 class="text-2xl font-bold mb-4 text-primary-blue">
+            <i class="fas fa-cloud-sun mr-2"></i>Forecasting
+        </h2>
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            <a href="/weather_impact_predictor" class="tooltip neumorphic p-4 h-40 flex items-center justify-center hover:bg-gray-100 transition duration-300" data-tooltip="Forecast weather effects on your solar plant performance">
+                <h3 class="text-lg font-semibold text-primary-blue text-center">Weather Impact Predictor</h3>
+            </a>
+            <a href="/generation_forecaster" class="tooltip neumorphic p-4 h-40 flex items-center justify-center hover:bg-gray-100 transition duration-300" data-tooltip="Forecast LTF generation">
+                <h3 class="text-lg font-semibold text-primary-blue text-center">Generation Forecaster</h3>
+            </a>
+        </div>
+    </section>
+
+    <section id="data-analysis">
+        <h2 class="text-2xl font-bold mb-4 text-primary-blue">
+            <i class="fas fa-database mr-2"></i>Data Analysis
+        </h2>
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            <a href="/solar_panel_degradation_analyzer" class="tooltip neumorphic p-4 h-40 flex items-center justify-center hover:bg-gray-100 transition duration-300" data-tooltip="Track and analyze solar panel performance over time">
+                <h3 class="text-lg font-semibold text-primary-blue text-center">Solar Panel Degradation Analyzer</h3>
+            </a>
+            <a href="/dga_analyzer" class="tooltip neumorphic p-4 h-40 flex items-center justify-center hover:bg-gray-100 transition duration-300" data-tooltip="Analyze dissolved gas in transformer oil">
+                <h3 class="text-lg font-semibold text-primary-blue text-center">DGA Analyzer</h3>
+            </a>
+            <a href="/reliability_reporting" class="tooltip neumorphic p-4 h-40 flex items-center justify-center hover:bg-gray-100 transition duration-300" data-tooltip="Calculate and analyze system reliability metrics">
+                <h3 class="text-lg font-semibold text-primary-blue text-center">Reliability Calculator</h3>
+            </a>
+        </div>
+    </section>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<!-- No additional JavaScript needed for basic tooltip functionality -->
+{% endblock %}

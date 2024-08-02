@@ -1,0 +1,139 @@
+{% extends "base.html" %}
+
+{% block title %}Performance Ratio Calculator{% endblock %}
+
+{% block heading %}Performance Ratio Calculator{% endblock %}
+
+{% block content %}
+<div class="bg-white shadow-md rounded-lg p-6">
+    <form id="prForm" class="space-y-4">
+        <div class="flex items-center">
+            <label for="measured_energy" class="block text-sm font-medium text-gray-700">Measured Energy Production:</label>
+            <div class="ml-2 relative group">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-400 cursor-help" viewBox="0 0 20 20" fill="currentColor">
+                    <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-8-3a1 1 0 00-.867.5 1 1 0 11-1.731-1A3 3 0 0113 8a3.001 3.001 0 01-2 2.83V11a1 1 0 11-2 0v-1a1 1 0 011-1 1 1 0 100-2zm0 8a1 1 0 100-2 1 1 0 000 2z" clip-rule="evenodd" />
+                </svg>
+                <div class="absolute hidden group-hover:block bg-black text-white text-xs rounded py-1 px-2 right-0 bottom-full w-48">
+                    The actual energy produced by the solar plant during the specified time period.
+                </div>
+            </div>
+        </div>
+        <div class="flex items-center">
+            <input type="number" id="measured_energy" name="measured_energy" required step="0.01" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
+            <select id="measured_energy_unit" name="measured_energy_unit" class="ml-2 block w-24 py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
+                <option value="kWh">kWh</option>
+                <option value="MWh">MWh</option>
+            </select>
+        </div>
+
+        <div class="flex items-center">
+            <label for="installed_capacity" class="block text-sm font-medium text-gray-700">Installed Capacity:</label>
+            <div class="ml-2 relative group">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-400 cursor-help" viewBox="0 0 20 20" fill="currentColor">
+                    <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-8-3a1 1 0 00-.867.5 1 1 0 11-1.731-1A3 3 0 0113 8a3.001 3.001 0 01-2 2.83V11a1 1 0 11-2 0v-1a1 1 0 011-1 1 1 0 100-2zm0 8a1 1 0 100-2 1 1 0 000 2z" clip-rule="evenodd" />
+                </svg>
+                <div class="absolute hidden group-hover:block bg-black text-white text-xs rounded py-1 px-2 right-0 bottom-full w-48">
+                    The total peak power output of your installed solar panels under standard test conditions.
+                </div>
+            </div>
+        </div>
+        <div class="flex items-center">
+            <input type="number" id="installed_capacity" name="installed_capacity" required step="0.01" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
+            <select id="installed_capacity_unit" name="installed_capacity_unit" class="ml-2 block w-24 py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
+                <option value="kW">kW</option>
+                <option value="MW">MW</option>
+            </select>
+        </div>
+
+        <div class="flex items-center">
+            <label for="avg_irradiance" class="block text-sm font-medium text-gray-700">Average Irradiance:</label>
+            <div class="ml-2 relative group">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-400 cursor-help" viewBox="0 0 20 20" fill="currentColor">
+                    <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-8-3a1 1 0 00-.867.5 1 1 0 11-1.731-1A3 3 0 0113 8a3.001 3.001 0 01-2 2.83V11a1 1 0 11-2 0v-1a1 1 0 011-1 1 1 0 100-2zm0 8a1 1 0 100-2 1 1 0 000 2z" clip-rule="evenodd" />
+                </svg>
+                <div class="absolute hidden group-hover:block bg-black text-white text-xs rounded py-1 px-2 right-0 bottom-full w-48">
+                    The average solar radiation received per unit area during the specified time period.
+                </div>
+            </div>
+        </div>
+        <input type="number" id="avg_irradiance" name="avg_irradiance" required step="0.01" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm" placeholder="W/m²">
+
+        <div class="flex items-center">
+            <label for="temperature" class="block text-sm font-medium text-gray-700">Average Module Temperature:</label>
+            <div class="ml-2 relative group">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-400 cursor-help" viewBox="0 0 20 20" fill="currentColor">
+                    <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-8-3a1 1 0 00-.867.5 1 1 0 11-1.731-1A3 3 0 0113 8a3.001 3.001 0 01-2 2.83V11a1 1 0 11-2 0v-1a1 1 0 011-1 1 1 0 100-2zm0 8a1 1 0 100-2 1 1 0 000 2z" clip-rule="evenodd" />
+                </svg>
+                <div class="absolute hidden group-hover:block bg-black text-white text-xs rounded py-1 px-2 right-0 bottom-full w-48">
+                    The average temperature of the solar panels during the specified time period.
+                </div>
+            </div>
+        </div>
+        <input type="number" id="temperature" name="temperature" required step="0.01" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm" placeholder="°C">
+
+        <div class="flex items-center">
+            <label for="custom_temp_coeff" class="block text-sm font-medium text-gray-700">Custom Temperature Coefficient (optional):</label>
+            <div class="ml-2 relative group">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-400 cursor-help" viewBox="0 0 20 20" fill="currentColor">
+                    <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-8-3a1 1 0 00-.867.5 1 1 0 11-1.731-1A3 3 0 0113 8a3.001 3.001 0 01-2 2.83V11a1 1 0 11-2 0v-1a1 1 0 011-1 1 1 0 100-2zm0 8a1 1 0 100-2 1 1 0 000 2z" clip-rule="evenodd" />
+                </svg>
+                <div class="absolute hidden group-hover:block bg-black text-white text-xs rounded py-1 px-2 right-0 bottom-full w-48">
+                    Custom temperature coefficient. If not provided, -0.0041 will be used.
+                </div>
+            </div>
+        </div>
+        <input type="number" id="custom_temp_coeff" name="custom_temp_coeff" step="0.0001" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm" placeholder="e.g. -0.0041">
+
+        <div class="flex items-center">
+            <label for="custom_temp_ref" class="block text-sm font-medium text-gray-700">Custom Temperature Reference (optional):</label>
+            <div class="ml-2 relative group">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-400 cursor-help" viewBox="0 0 20 20" fill="currentColor">
+                    <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-8-3a1 1 0 00-.867.5 1 1 0 11-1.731-1A3 3 0 0113 8a3.001 3.001 0 01-2 2.83V11a1 1 0 11-2 0v-1a1 1 0 011-1 1 1 0 100-2zm0 8a1 1 0 100-2 1 1 0 000 2z" clip-rule="evenodd" />
+                </svg>
+                <div class="absolute hidden group-hover:block bg-black text-white text-xs rounded py-1 px-2 right-0 bottom-full w-48">
+                    Custom temperature reference. If not provided, 25°C will be used.
+                </div>
+            </div>
+        </div>
+        <input type="number" id="custom_temp_ref" name="custom_temp_ref" step="0.1" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm" placeholder="e.g. 25">
+
+        <div class="flex items-center">
+            <label for="time_period" class="block text-sm font-medium text-gray-700">Time Period:</label>
+            <div class="ml-2 relative group">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-400 cursor-help" viewBox="0 0 20 20" fill="currentColor">
+                    <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-8-3a1 1 0 00-.867.5 1 1 0 11-1.731-1A3 3 0 0113 8a3.001 3.001 0 01-2 2.83V11a1 1 0 11-2 0v-1a1 1 0 011-1 1 1 0 100-2zm0 8a1 1 0 100-2 1 1 0 000 2z" clip-rule="evenodd" />
+                </svg>
+                <div class="absolute hidden group-hover:block bg-black text-white text-xs rounded py-1 px-2 right-0 bottom-full w-48">
+                    The duration over which the energy production and other measurements were taken. (Inverter Service Hours)
+                </div>
+            </div>
+        </div>
+        <input type="number" id="time_period" name="time_period" required step="0.01" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm" placeholder="hours">
+
+        <div class="flex items-center mt-4">
+            <label for="benchmark" class="mr-2">Benchmark PR (%):</label>
+            <input type="number" id="benchmark" name="benchmark" min="0" max="100" step="0.01" class="border rounded px-2 py-1">
+            <select id="benchmarkPreset" class="ml-2 border rounded px-2 py-1">
+                <option value="">Custom</option>
+                <option value="75">Industry Average (75%)</option>
+                <option value="80">Good Performance (80%)</option>
+                <option value="85">Excellent Performance (85%)</option>
+            </select>
+            <span class="ml-2 text-gray-500 cursor-help" title="Enter a custom benchmark or select a predefined industry standard">ⓘ</span>
+        </div>
+        
+        <button type="submit" class="mt-4 bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">Calculate PR</button>
+    </form>
+
+    <div id="result" class="mt-6"></div>
+    <div id="benchmarkComparison" class="mt-4"></div>
+    <div id="chart-container" class="mt-6">
+        <canvas id="prChart"></canvas>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="{{ url_for('static', filename='js/pr_calculator.js') }}"></script>
+{% endblock %}

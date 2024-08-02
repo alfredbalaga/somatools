@@ -1,0 +1,344 @@
+{% extends "base.html" %}
+
+{% block title %}Solar Fault Diagnosis System{% endblock %}
+
+{% block heading %}Solar Fault Diagnosis System{% endblock %}
+
+{% block content %}
+<div class="bg-white shadow-md rounded-lg p-6">
+    <p class="mb-4">Answer the following questions to diagnose potential faults in your solar power system.</p>
+    
+    <div id="questionContainer" class="mb-6">
+        <h3 id="question" class="text-lg font-semibold mb-2"></h3>
+        <div id="options" class="space-y-2"></div>
+    </div>
+
+    <div id="diagnosis" class="mt-6 p-4 bg-blue-50 border border-blue-200 rounded-md hidden">
+        <h3 class="text-lg font-semibold mb-2">Diagnosis:</h3>
+        <p id="diagnosisResult"></p>
+    </div>
+
+    <button id="restartBtn" class="mt-4 inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 hidden">
+        Restart Diagnosis
+    </button>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+const decisionTree = {
+    question: "What is the main issue you're experiencing?",
+    options: [
+        {
+            text: "No power output",
+            next: {
+                question: "Is the inverter powered on?",
+                options: [
+                    {
+                        text: "Yes",
+                        next: {
+                            question: "Are there any error messages on the inverter display?",
+                            options: [
+                                {
+                                    text: "Yes",
+                                    result: "Inverter error detected. Check the error code in the inverter manual and contact a technician if needed. Common issues include grid voltage/frequency out of range, isolation fault, or inverter overheating."
+                                },
+                                {
+                                    text: "No",
+                                    next: {
+                                        question: "Is it nighttime or very cloudy?",
+                                        options: [
+                                            {
+                                                text: "Yes",
+                                                result: "Low light conditions detected. If this persists during daylight hours, check panel connections and wiring. Ensure there's no shading on the panels."
+                                            },
+                                            {
+                                                text: "No",
+                                                next: {
+                                                    question: "Have you checked the DC disconnect switch?",
+                                                    options: [
+                                                        {
+                                                            text: "Yes, it's on",
+                                                            result: "Potential wiring issue between panels and inverter. Inspect wiring and connections, and test for continuity. Check for any signs of rodent damage or loose connections."
+                                                        },
+                                                        {
+                                                            text: "No, or I'm not sure",
+                                                            result: "Check the DC disconnect switch. This switch is usually located near the inverter or on the roof. Ensure it's in the 'On' position. If this doesn't resolve the issue, consult with a technician."
+                                                        }
+                                                    ]
+                                                }
+                                            }
+                                        ]
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    {
+                        text: "No",
+                        next: {
+                            question: "Is there power at the main AC disconnect?",
+                            options: [
+                                {
+                                    text: "Yes",
+                                    result: "Inverter power issue. Check inverter power supply, fuses, and wiring. If no obvious issues are found, the inverter may need to be replaced. Consult with a technician."
+                                },
+                                {
+                                    text: "No",
+                                    next: {
+                                        question: "Is the main circuit breaker for the solar system tripped?",
+                                        options: [
+                                            {
+                                                text: "Yes",
+                                                result: "Reset the circuit breaker. If it trips again immediately, there may be a short circuit or ground fault. Do not reset again and consult an electrician immediately."
+                                            },
+                                            {
+                                                text: "No",
+                                                result: "Check for power at the utility meter. If there's no power, contact your utility company as there may be a grid outage. If there is power, there might be an issue with the main service panel. Consult an electrician."
+                                            }
+                                        ]
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                ]
+            }
+        },
+        {
+            text: "Lower than expected power output",
+            next: {
+                question: "How long has this issue been occurring?",
+                options: [
+                    {
+                        text: "Recently noticed",
+                        next: {
+                            question: "Have there been any recent weather changes?",
+                            options: [
+                                {
+                                    text: "Yes, it's been cloudy or rainy",
+                                    result: "Weather conditions are likely affecting your system's output. Monitor the system when weather improves. If the issue persists in clear weather, further investigation may be needed."
+                                },
+                                {
+                                    text: "No, weather has been clear",
+                                    next: {
+                                        question: "Are there any visible signs of damage or dirt on the panels?",
+                                        options: [
+                                            {
+                                                text: "Yes",
+                                                result: "Panel damage or soiling detected. Clean the panels carefully with water and a soft brush. Inspect for cracks, discoloration, or other damage. If damage is found, consult a technician for repair or replacement."
+                                            },
+                                            {
+                                                text: "No",
+                                                next: {
+                                                    question: "Has there been any recent construction or tree growth nearby?",
+                                                    options: [
+                                                        {
+                                                            text: "Yes",
+                                                            result: "Potential new shading issue. Conduct a shading analysis and consider trimming trees or adjusting panel layout if possible. Consult with a solar professional for the best solution."
+                                                        },
+                                                        {
+                                                            text: "No",
+                                                            result: "Possible inverter efficiency issue or panel degradation. Check inverter efficiency in its monitoring system. Consider performing I-V curve tests on the panels to check for degradation. A professional inspection may be necessary."
+                                                        }
+                                                    ]
+                                                }
+                                            }
+                                        ]
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    {
+                        text: "Gradual decrease over time",
+                        next: {
+                            question: "Is the decrease more than expected panel degradation (usually 0.5-1% per year)?",
+                            options: [
+                                {
+                                    text: "Yes",
+                                    next: {
+                                        question: "Have you regularly cleaned and maintained the system?",
+                                        options: [
+                                            {
+                                                text: "Yes",
+                                                result: "Higher than normal degradation detected. Perform a detailed system check including I-V curve tests, thermal imaging, and electroluminescence testing if possible. Consult with a solar technician for a thorough evaluation."
+                                            },
+                                            {
+                                                text: "No",
+                                                result: "Lack of maintenance may be causing accelerated degradation. Clean the panels and perform basic maintenance. If output doesn't improve, schedule a professional inspection to check for any damaged components or connection issues."
+                                            }
+                                        ]
+                                    }
+                                },
+                                {
+                                    text: "No",
+                                    result: "The system seems to be degrading normally. Continue regular maintenance and monitoring. Consider a professional check-up if you haven't had one recently to ensure optimal performance."
+                                }
+                            ]
+                        }
+                    }
+                ]
+            }
+        },
+        {
+            text: "Intermittent power output",
+            next: {
+                question: "Does the issue occur at specific times of day?",
+                options: [
+                    {
+                        text: "Yes, usually in the morning or evening",
+                        result: "Likely a shading issue. Conduct a shading analysis throughout the day. Look for obstructions like trees or buildings that might be shading the panels at certain angles. Consider trimming trees or adjusting panel layout if possible."
+                    },
+                    {
+                        text: "No, it's random",
+                        next: {
+                            question: "Have you noticed any correlation with weather conditions?",
+                            options: [
+                                {
+                                    text: "Yes, it happens more on hot days",
+                                    result: "Possible inverter overheating or panel hot spots. Check inverter placement for proper ventilation. Perform a thermal scan of the panels to identify any hot spots. Consider professional maintenance to address these issues."
+                                },
+                                {
+                                    text: "No clear correlation",
+                                    next: {
+                                        question: "Have you checked all wiring connections?",
+                                        options: [
+                                            {
+                                                text: "Yes, they seem fine",
+                                                result: "Intermittent connection issue or faulty microinverter/optimizer suspected. Perform a thorough check of all connections, including junction boxes and MC4 connectors. Consider hiring a professional to test each panel and connection point."
+                                            },
+                                            {
+                                                text: "No, I haven't checked",
+                                                result: "Inspect all accessible wiring connections for looseness, corrosion, or damage. Pay special attention to junction boxes and MC4 connectors. If you're not comfortable doing this, or if no issues are found, consult a professional for a thorough inspection."
+                                            }
+                                        ]
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                ]
+            }
+        },
+        {
+            text: "Unusual noises from the inverter",
+            next: {
+                question: "What type of noise are you hearing?",
+                options: [
+                    {
+                        text: "High-pitched whine or buzzing",
+                        result: "This could indicate an issue with the inverter's internal components, possibly the capacitors or cooling fans. Check if the noise correlates with specific times or temperatures. If persistent, contact the inverter manufacturer or a qualified technician for inspection."
+                    },
+                    {
+                        text: "Clicking or popping sounds",
+                        result: "Clicking sounds can be normal for some inverters, especially when powering on or off. However, frequent or loud clicking/popping might indicate a problem with relays or other internal components. Monitor the frequency and consult the inverter manual. If concerned, contact a technician for inspection."
+                    },
+                    {
+                        text: "Loud humming or vibration",
+                        next: {
+                            question: "Is the noise constant or intermittent?",
+                            options: [
+                                {
+                                    text: "Constant",
+                                    result: "Constant humming might indicate an issue with the inverter's transformer or cooling system. Ensure the inverter is properly mounted and not in contact with any resonating surfaces. If the noise is excessive, contact a technician for further diagnosis."
+                                },
+                                {
+                                    text: "Intermittent",
+                                    result: "Intermittent humming or vibration could be related to varying power output or grid interactions. Check if it correlates with specific times or weather conditions. If the noise is new or concerning, document when it occurs and consult with a solar technician."
+                                }
+                            ]
+                        }
+                    }
+                ]
+            }
+        },
+        {
+            text: "System is not connecting to monitoring platform",
+            next: {
+                question: "Is your internet connection working properly?",
+                options: [
+                    {
+                        text: "Yes, internet is working fine",
+                        next: {
+                            question: "Have you checked the monitoring device or gateway?",
+                            options: [
+                                {
+                                    text: "Yes, it appears to be powered on and connected",
+                                    result: "The issue might be with the communication between the inverter and the monitoring device, or with the monitoring service itself. Try resetting both the inverter and monitoring device. Check all communication cables. If the problem persists, contact your system installer or the monitoring service provider."
+                                },
+                                {
+                                    text: "No, or I'm not sure how",
+                                    result: "Locate the monitoring device or gateway (often near the inverter or router). Ensure it's powered on and all cables are securely connected. Look for any status LEDs indicating connectivity. If you can't identify or access the device, contact your system installer for guidance."
+                                }
+                            ]
+                        }
+                    },
+                    {
+                        text: "No, or I'm not sure",
+                        result: "First, verify your internet connection is working properly. Check other devices on the network. If the internet is down, contact your ISP. Once internet is restored, allow some time for the monitoring system to reconnect and update. If issues persist after internet is restored, check the monitoring device connections."
+                    }
+                ]
+            }
+        }
+    ]
+};
+
+let currentNode = decisionTree;
+
+function displayQuestion() {
+    const questionContainer = document.getElementById('questionContainer');
+    const questionElement = document.getElementById('question');
+    const optionsElement = document.getElementById('options');
+
+    questionElement.textContent = currentNode.question;
+    optionsElement.innerHTML = '';
+
+    currentNode.options.forEach(option => {
+        const button = document.createElement('button');
+        button.textContent = option.text;
+        button.className = 'w-full text-left px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500';
+        button.onclick = () => selectOption(option);
+        optionsElement.appendChild(button);
+    });
+}
+
+function selectOption(option) {
+    if (option.result) {
+        displayDiagnosis(option.result);
+    } else {
+        currentNode = option.next;
+        displayQuestion();
+    }
+}
+
+function displayDiagnosis(result) {
+    const diagnosisElement = document.getElementById('diagnosis');
+    const diagnosisResult = document.getElementById('diagnosisResult');
+    const questionContainer = document.getElementById('questionContainer');
+    const restartBtn = document.getElementById('restartBtn');
+
+    diagnosisResult.textContent = result;
+    questionContainer.classList.add('hidden');
+    diagnosisElement.classList.remove('hidden');
+    restartBtn.classList.remove('hidden');
+}
+
+function restartDiagnosis() {
+    currentNode = decisionTree;
+    const diagnosisElement = document.getElementById('diagnosis');
+    const questionContainer = document.getElementById('questionContainer');
+    const restartBtn = document.getElementById('restartBtn');
+
+    diagnosisElement.classList.add('hidden');
+    questionContainer.classList.remove('hidden');
+    restartBtn.classList.add('hidden');
+    displayQuestion();
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+    displayQuestion();
+    document.getElementById('restartBtn').addEventListener('click', restartDiagnosis);
+});
+</script>
+{% endblock %}

@@ -1,0 +1,76 @@
+{% extends "base.html" %}
+{% block title %}Generation Forecaster{% endblock %}
+{% block heading %}Generation Forecaster{% endblock %}
+{% block content %}
+
+<div class="bg-white shadow-md rounded-lg p-6">
+    <form id="forecastForm" class="mb-8">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                <div>
+                    <label for="startDate" class="block text-sm font-medium text-gray-700">Start Date:</label>
+                    <input type="month" id="startDate" name="startDate" required class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm">
+                </div>
+                <div>
+                    <label for="forecastMonths" class="block text-sm font-medium text-gray-700">Number of Months to Forecast:</label>
+                    <select id="forecastMonths" name="forecastMonths" required class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm">
+                        <option value="1">1 month</option>
+                        <option value="3">3 months</option>
+                        <option value="6">6 months</option>
+                        <option value="12">1 year</option>
+                    </select>
+                </div>
+            </div>
+        
+        <div id="rainfallInputs" class="space-y-4 mb-4">
+            <!-- Rainfall category inputs will be dynamically added here -->
+        </div>
+        
+        <div class="mt-6">
+            <button type="submit" class="bg-primary-blue hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+                Generate Forecast
+            </button>
+        </div>
+    </form>
+
+    <div id="loadingIndicator" class="hidden mt-4">
+        <div class="flex items-center justify-center">
+            <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-blue"></div>
+        </div>
+        <p class="text-center mt-2">Generating forecast, please wait...</p>
+    </div>
+    
+    <div id="results" class="hidden">
+        <h2 class="text-2xl font-bold mb-4">Forecast Results</h2>
+        <div class="overflow-x-auto">
+            <table class="min-w-full bg-white">
+                <thead class="bg-gray-100">
+                    <tr>
+                        <th class="py-2 px-4 border">Month</th>
+                        <th class="py-2 px-4 border">Random Forest (kWh)</th>
+                        <th class="py-2 px-4 border">XGBoost (kWh)</th>
+                        <th class="py-2 px-4 border">ARIMA (kWh)</th>
+                        <th class="py-2 px-4 border">Ensemble (kWh)</th>
+                    </tr>
+                </thead>
+                <tbody id="forecastTable">
+                    <!-- Forecast results will be dynamically added here -->
+                </tbody>
+            </table>
+        </div>
+        
+        <div class="mt-8">
+            <canvas id="forecastChart"></canvas>
+        </div>
+        
+        <div id="insights" class="mt-8 p-4 bg-blue-50 border border-blue-200 rounded-md">
+            <!-- Insights will be dynamically added here -->
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="{{ url_for('static', filename='js/generation_forecaster.js') }}"></script>
+{% endblock %}

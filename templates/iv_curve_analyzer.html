@@ -1,0 +1,120 @@
+{% extends "base.html" %}
+{% block title %}I-V Curve Analyzer{% endblock %}
+{% block heading %}I-V Curve Analyzer{% endblock %}
+{% block content %}
+
+<div class="bg-white shadow-md rounded-lg p-6">
+    <div id="inputForm" class="space-y-6">
+        <div id="curveInputs">
+            <div class="curve-input mb-6 p-4 bg-gray-50 rounded-md">
+                <h3 class="text-lg font-semibold mb-4">Curve 1</h3>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                    <div>
+                        <label for="voc1" class="block text-sm font-medium text-gray-700">Open Circuit Voltage (V):</label>
+                        <input type="number" id="voc1" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm" required>
+                    </div>
+                    <div>
+                        <label for="isc1" class="block text-sm font-medium text-gray-700">Short Circuit Current (A):</label>
+                        <input type="number" id="isc1" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm" required>
+                    </div>
+                    <div>
+                        <label for="pmax1" class="block text-sm font-medium text-gray-700">Rated Maximum Power (W):</label>
+                        <input type="number" id="pmax1" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm" required>
+                    </div>
+                </div>
+
+                <h4 class="text-md font-medium mb-2">Measured V-I Pairs</h4>
+                <div id="measurementInputs1" class="space-y-2">
+                    <div class="measurement-pair flex space-x-4">
+                        <input type="number" class="voltage mt-1 block w-full border border-gray-300 rounded-md shadow-sm" placeholder="Voltage (V)" step="0.01">
+                        <input type="number" class="current mt-1 block w-full border border-gray-300 rounded-md shadow-sm" placeholder="Current (A)" step="0.01">
+                    </div>
+                </div>
+                <button onclick="addMeasurement(1)" class="mt-2 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600">Add Measurement</button>
+            </div>
+        </div>
+        
+        <button onclick="addCurveInput()" class="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600">Add Another Curve</button>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+                <label for="irradiance" class="block text-sm font-medium text-gray-700">Irradiance (W/m²):</label>
+                <input type="number" id="irradiance" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm" required>
+            </div>
+            <div>
+                <label for="temperature" class="block text-sm font-medium text-gray-700">Temperature (°C):</label>
+                <input type="number" id="temperature" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm" required>
+            </div>
+        </div>
+
+        <button onclick="analyzeIVCurves()" class="w-full px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">Analyze I-V Curves</button>
+    </div>
+
+    <div id="loadingIndicator" class="hidden">
+        Analyzing curves... Please wait.
+    </div>
+    
+    <div id="results" class="mt-8 hidden">
+        <h2 class="text-xl font-semibold mb-4">Analysis Results</h2>
+        
+        <div id="chartContainer" class="mb-6">
+            <canvas id="ivChart"></canvas>
+        </div>
+
+        <div id="chartContainer" class="mb-6">
+            <canvas id="irradianceChart"></canvas>
+        </div>
+        
+        <div id="keyParameters" class="mb-6">
+            <h3 class="text-lg font-medium mb-2">Key Parameters</h3>
+            <!-- Key parameters will be inserted here by JavaScript -->
+        </div>
+        
+        <div id="faults" class="mb-6">
+            <h3 class="text-lg font-medium mb-2">Detected Faults</h3>
+            <!-- Detected faults will be inserted here by JavaScript -->
+        </div>
+        
+        <div id="comparison" class="mb-6">
+            <h3 class="text-lg font-medium mb-2">Comparison with Ideal Curve</h3>
+            <!-- Comparison results will be inserted here by JavaScript -->
+        </div>
+        
+        <div id="environmentalCorrections" class="mb-6">
+            <h3 class="text-lg font-medium mb-2">Environmental Corrections</h3>
+            <!-- Correction results will be inserted here by JavaScript -->
+        </div>
+    </div>
+
+    <div id="guide" class="mt-8 p-4 bg-blue-50 border border-blue-200 rounded-md">
+        <h3 class="text-lg font-medium mb-2">Analysis Guide</h3>
+        <p>Follow these steps to interpret your I-V curve analysis:</p>
+        <ol class="list-decimal list-inside space-y-2">
+            <li>Enter the system specifications and environmental conditions.</li>
+            <li>Input measured voltage-current pairs for each curve you want to analyze.</li>
+            <li>Click "Analyze I-V Curves" to generate results.</li>
+            <li>Review the generated chart, key parameters, and any detected faults.</li>
+            <li>Compare the measured curve(s) with the ideal curve.</li>
+            <li>Check the environmental corrections to understand the impact of current conditions.</li>
+            <li>If multiple curves are analyzed, compare their performance.</li>
+        </ol>
+    </div>
+
+    <div class="mt-8">
+        <h3 class="text-lg font-medium mb-2">Related Tools</h3>
+        <div class="flex space-x-4">
+            <a href="/pr_calculator" class="px-4 py-2 bg-gray-200 text-gray-700 rounded hover:bg-gray-300">Performance Ratio Calculator</a>
+            <a href="/solar_panel_degradation_analyzer" class="px-4 py-2 bg-gray-200 text-gray-700 rounded hover:bg-gray-300">Degradation Analyzer</a>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/hammer.js/2.0.8/hammer.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/chartjs-plugin-zoom/1.2.1/chartjs-plugin-zoom.min.js"></script>
+<script src="{{ url_for('static', filename='js/iv_curve_analyzer.js') }}"></script>
+{% endblock %}

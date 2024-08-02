@@ -1,0 +1,180 @@
+{% extends "base.html" %}
+
+{% block title %}Solar String Fault Detector{% endblock %}
+
+{% block heading %}Solar String Fault Detector{% endblock %}
+
+{% block content %}
+<div class="bg-white shadow-md rounded-lg p-6">
+    <p class="mb-4">This tool helps identify potential faults in solar panel strings based on voltage and current measurements.</p>
+
+    <form id="faultDetectorForm" class="space-y-4">
+        <h2 class="text-xl font-semibold mb-2">System Configuration</h2>
+        <div>
+            <label for="panelsPerString" class="block text-sm font-medium text-gray-700">Number of Panels per String:</label>
+            <input type="number" id="panelsPerString" required min="1" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
+        </div>
+
+        <div>
+            <label for="nominalVoltage" class="block text-sm font-medium text-gray-700">Nominal Voltage per Panel (V):</label>
+            <input type="number" id="nominalVoltage" required min="0" step="0.1" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
+        </div>
+
+        <div>
+            <label for="nominalCurrent" class="block text-sm font-medium text-gray-700">Nominal Current per String (A):</label>
+            <input type="number" id="nominalCurrent" required min="0" step="0.1" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
+        </div>
+
+        <div>
+            <label for="irradiance" class="block text-sm font-medium text-gray-700">Current Irradiance (W/m²):</label>
+            <input type="number" id="irradiance" required min="0" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
+        </div>
+
+        <div>
+            <label for="temperature" class="block text-sm font-medium text-gray-700">Ambient Temperature (°C):</label>
+            <input type="number" id="temperature" required class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
+        </div>
+
+        <h2 class="text-xl font-semibold mb-2">String Measurements</h2>
+        <div id="stringInputs">
+            <div class="string-input space-y-4">
+                <h3 class="text-lg font-medium">String 1</h3>
+                <div>
+                    <label for="voltage1" class="block text-sm font-medium text-gray-700">Measured Voltage (V):</label>
+                    <input type="number" id="voltage1" required min="0" step="0.1" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
+                </div>
+                <div>
+                    <label for="current1" class="block text-sm font-medium text-gray-700">Measured Current (A):</label>
+                    <input type="number" id="current1" required min="0" step="0.1" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
+                </div>
+            </div>
+        </div>
+
+        <button type="button" onclick="addString()" class="mt-2 inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500">
+            Add Another String
+        </button>
+
+        <div>
+            <button type="submit" class="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                Detect Faults
+            </button>
+        </div>
+    </form>
+
+    <div id="result" class="mt-6"></div>
+    <canvas id="chart" class="mt-6"></canvas>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    let stringCount = 1;
+    let myChart;
+
+    function addString() {
+        stringCount++;
+        const newString = document.createElement('div');
+        newString.className = 'string-input space-y-4 mt-4';
+        newString.innerHTML = `
+            <h3 class="text-lg font-medium">String ${stringCount}</h3>
+            <div>
+                <label for="voltage${stringCount}" class="block text-sm font-medium text-gray-700">Measured Voltage (V):</label>
+                <input type="number" id="voltage${stringCount}" required min="0" step="0.1" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
+            </div>
+            <div>
+                <label for="current${stringCount}" class="block text-sm font-medium text-gray-700">Measured Current (A):</label>
+                <input type="number" id="current${stringCount}" required min="0" step="0.1" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
+            </div>
+        `;
+        document.getElementById('stringInputs').appendChild(newString);
+    }
+
+    function detectFaults(e) {
+        e.preventDefault();
+        const panelsPerString = parseInt(document.getElementById('panelsPerString').value);
+        const nominalVoltage = parseFloat(document.getElementById('nominalVoltage').value);
+        const nominalCurrent = parseFloat(document.getElementById('nominalCurrent').value);
+        const irradiance = parseFloat(document.getElementById('irradiance').value);
+        const temperature = parseFloat(document.getElementById('temperature').value);
+
+        const expectedVoltage = panelsPerString * nominalVoltage * (1 - 0.004 * (temperature - 25));
+        const expectedCurrent = nominalCurrent * (irradiance / 1000);
+
+        let results = '';
+        const voltages = [];
+        const currents = [];
+
+        for (let i = 1; i <= stringCount; i++) {
+            const measuredVoltage = parseFloat(document.getElementById(`voltage${i}`).value);
+            const measuredCurrent = parseFloat(document.getElementById(`current${i}`).value);
+
+            voltages.push(measuredVoltage);
+            currents.push(measuredCurrent);
+
+            const voltageDiff = Math.abs(measuredVoltage - expectedVoltage) / expectedVoltage;
+            const currentDiff = Math.abs(measuredCurrent - expectedCurrent) / expectedCurrent;
+
+            results += `<h3 class="text-lg font-medium mt-4">String ${i}</h3>`;
+            if (voltageDiff > 0.1 && currentDiff > 0.1) {
+                results += `<p class="text-red-600">Major fault detected: Both voltage and current are significantly off.</p>`;
+            } else if (voltageDiff > 0.1) {
+                results += `<p class="text-orange-600">Potential fault: Voltage is significantly off. Check for panel or connection issues.</p>`;
+            } else if (currentDiff > 0.1) {
+                results += `<p class="text-orange-600">Potential fault: Current is significantly off. Check for shading or panel degradation.</p>`;
+            } else {
+                results += `<p class="text-green-600">No significant issues detected.</p>`;
+            }
+            results += `<p>Voltage Difference: ${(voltageDiff * 100).toFixed(2)}%</p>`;
+            results += `<p>Current Difference: ${(currentDiff * 100).toFixed(2)}%</p>`;
+        }
+
+        document.getElementById('result').innerHTML = results;
+        updateChart(voltages, currents, expectedVoltage, expectedCurrent);
+    }
+
+    function updateChart(voltages, currents, expectedVoltage, expectedCurrent) {
+        const ctx = document.getElementById('chart').getContext('2d');
+        
+        if (myChart) {
+            myChart.destroy();
+        }
+        
+        myChart = new Chart(ctx, {
+            type: 'scatter',
+            data: {
+                datasets: [{
+                    label: 'Measured Values',
+                    data: voltages.map((v, i) => ({x: v, y: currents[i]})),
+                    backgroundColor: 'rgba(75, 192, 192, 0.6)'
+                }, {
+                    label: 'Expected Value',
+                    data: [{x: expectedVoltage, y: expectedCurrent}],
+                    backgroundColor: 'rgba(255, 99, 132, 0.6)'
+                }]
+            },
+            options: {
+                scales: {
+                    x: {
+                        type: 'linear',
+                        position: 'bottom',
+                        title: {
+                            display: true,
+                            text: 'Voltage (V)'
+                        }
+                    },
+                    y: {
+                        title: {
+                            display: true,
+                            text: 'Current (A)'
+                        }
+                    }
+                }
+            }
+        });
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+        document.getElementById('faultDetectorForm').addEventListener('submit', detectFaults);
+    });
+</script>
+{% endblock %}
